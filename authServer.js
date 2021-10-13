@@ -74,3 +74,24 @@ authServer.post("signOutOfAllDevices", (req, res) => {
     status: "success",
   });
 });
+
+authServer.post("/refresh", (req, res) => {
+  const { userData, refreshToken } = req.body;
+  const { userId } = userData;
+
+  if (refreshTokens[userId] && refreshTokens[userId].includes(refreshToken)) {
+    const accessToken = getAccessToken(userData);
+    res.status(200).json({
+      status: "success",
+      message: {
+        accessToken,
+        expiresIn: "1h",
+      },
+    });
+  } else {
+    res.status(401).json({
+      message: "unauthorized access",
+      status: "error",
+    });
+  }
+});

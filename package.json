@@ -1,25 +1,26 @@
 {
-  "name": "auth",
+  "name": "jwt-authentication",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon -r dotenv/config .",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/harishsambasivam/JWT-Authentication.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/harishsambasivam/JWT-Authentication/issues"
+  },
+  "homepage": "https://github.com/harishsambasivam/JWT-Authentication#readme",
   "dependencies": {
-    "bcrypt": "^5.0.0",
-    "cookie-parser": "^1.4.5",
-    "cors": "^2.8.5",
-    "dotenv": "^8.2.0",
+    "bcrypt": "^5.0.1",
+    "dotenv": "^10.0.0",
     "express": "^4.17.1",
-    "express-session": "^1.17.1",
-    "morgan": "^1.10.0",
-    "nodemon": "^2.0.7",
-    "pg": "^8.5.1",
-    "sequelize": "^6.5.0"
+    "jsonwebtoken": "^8.5.1"
   }
 }

@@ -12,12 +12,12 @@ authServer.listen(process.env.AUTH_SERVER_PORT, () => {
   console.log(`Server running on PORT ${process.env.AUTH_SERVER_PORT}`);
 });
 
-// const redisLogger = function (req, res, next) {
-//   console.log(JSON.stringify(refreshTokens, null, 2));
-//   next();
-// };
+const redisLogger = function (req, res, next) {
+  console.log(JSON.stringify(refreshTokens, null, 2));
+  next();
+};
 
-// authServer.use(redisLogger);
+authServer.use(redisLogger);
 
 authServer.get("/", (req, res) => {
   res.send("server is up and running...");
@@ -48,25 +48,23 @@ authServer.post("/login", (req, res) => {
   }
 });
 
-authServer.post("/logout", (req, res) => {
-  const { userData, refreshToken } = req.body;
-  const { userId } = userData;
-
+authServer.delete("/logout", (req, res) => {
+  const { refreshToken } = req.body;
+  const { userId } = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
   if (refreshTokens[userId]) {
     refreshTokens[userId] = refreshTokens[userId].filter(
       (token) => token != refreshToken
     );
     console.log(refreshTokens[userId]);
   }
-
   res.status(200).json({
     status: "success",
   });
 });
 
-authServer.post("signOutOfAllDevices", (req, res) => {
-  const { userData } = req.body;
-  const { userId } = userData;
+authServer.delete("/logOutOfAllDevices", (req, res) => {
+  const { refreshToken } = req.body;
+  const { userId } = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
   if (refreshTokens[userId]) {
     delete refreshTokens[userId];
   }
@@ -76,8 +74,8 @@ authServer.post("signOutOfAllDevices", (req, res) => {
 });
 
 authServer.post("/refresh", (req, res) => {
-  const { userData, refreshToken } = req.body;
-  const { userId } = userData;
+  const { refreshToken } = req.body;
+  const { userId } = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 
   if (refreshTokens[userId] && refreshTokens[userId].includes(refreshToken)) {
     const accessToken = getAccessToken(userData);

@@ -8,9 +8,9 @@ const {
   refreshAccessToken,
 } = require("./controller");
 
-router.route("/login").post((req, res) => {
+router.route("/login").post(async (req, res) => {
   try {
-    const { result: data, err } = logIn(req.body);
+    const { data, err } = await logIn(req.body);
     if (err) throw err;
     return res.status(200).send({
       message: data,
@@ -26,9 +26,9 @@ router.route("/login").post((req, res) => {
   }
 });
 
-router.route("/signup").post((req, res) => {
+router.route("/signup").post(async (req, res) => {
   try {
-    const { result: data, err } = signUp(req.body);
+    const { data, err } = await signUp(req.body);
     if (err) throw err;
     return res.status(200).send({
       message: data,

@@ -1,21 +1,44 @@
 const jwt = require("jsonwebtoken");
-const { getAccessToken, getRefreshToken } = require("../../utils");
+const {
+  getAccessToken,
+  getRefreshToken,
+  hashPassword,
+} = require("../../utils");
 const { getRedis } = require("../../db/redis");
 const { getMongoDB } = require("../../db/mongo");
+
 const mongodb = getMongoDB();
 const redis = getRedis();
 
 // add new user
-module.exports.signUp = () => {
+module.exports.signUp = async (userData) => {
   let data,
     err = null;
+  try {
+    let { username, email, password } = userData;
+    password = await hashPassword(password);
+    const dbResponse = await mongodb.collection("test").insertOne({
+      username,
+      email,
+      password,
+    });
+    data = { userId: dbResponse?.insertedId };
+  } catch (e) {
+    if (e) err = e;
+  }
   return { data, err };
 };
 
 // login
-module.exports.logIn = (req, res) => {
-  let { userData } = req.body;
+module.exports.logIn = async (userData) => {
   const { userId } = userData;
+
+  const user = await mongodb
+    .collection("test")
+    .find({ userId: "617d12df7b82331324b6f03d" })
+    .toArray();
+
+  console.log(user);
 
   // validate user creds in db
   const userExists = true;

@@ -20,3 +20,8 @@ module.exports.hashPassword = async (password) => {
     throw err;
   }
 };
+
+module.exports.verifyPassword = async (plainTextPassword, hashedPassword) => {
+  const result = await bcrypt.compare(plainTextPassword, hashedPassword);
+  return result === true;
+};

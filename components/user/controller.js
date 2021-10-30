@@ -3,9 +3,9 @@ const {
   getAccessToken,
   getRefreshToken,
   hashPassword,
-} = require("../../utils");
-const { getRedis } = require("../../db/redis");
-const { getMongoDB } = require("../../db/mongo");
+} = require("../utils/utils");
+const { getRedis } = require("../../dbconfig/redis.connection");
+const { getMongoDB } = require("../../dbconfig/mongodb.connection");
 
 const mongodb = getMongoDB();
 const redis = getRedis();

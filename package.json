@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon authServer.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --verbose --setupFiles dotenv/config"
   },
   "repository": {
     "type": "git",
@@ -19,10 +19,12 @@
   },
   "homepage": "https://github.com/harishsambasivam/JWT-Authentication#readme",
   "dependencies": {
+    "@types/jest": "^27.0.2",
     "bcrypt": "^5.0.1",
     "bluebird": "^3.7.2",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "jest": "^27.3.1",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.1.3",
     "nodemon": "^2.0.13",

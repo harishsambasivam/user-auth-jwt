@@ -1,10 +1,10 @@
 async function init() {
   const express = require("express");
   const authServer = express();
-  require("dotenv").config({ path: "./src/config/.env" });
+  require("dotenv").config();
 
-  const { connectRedis } = require("./src/db/redis");
-  const { connectMongoDB } = require("./src/db/mongo");
+  const { connectRedis } = require("./dbconfig/redis.connection");
+  const { connectMongoDB } = require("./dbconfig/mongodb.connection");
 
   authServer.use(express.json());
 
@@ -20,7 +20,7 @@ async function init() {
     console.error(e);
   }
 
-  const userRouter = require("./src/components/user/router");
+  const userRouter = require("./components/user/router");
 
   authServer.get("/", async (req, res) => {
     res.send("server is up and running...");

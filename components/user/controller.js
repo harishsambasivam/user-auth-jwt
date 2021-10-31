@@ -6,7 +6,6 @@ const {
 } = require("../utils/utils");
 const { getRedis } = require("../../dbconfig/redis.connection");
 const { getMongoDB } = require("../../dbconfig/mongodb.connection");
-
 const mongodb = getMongoDB();
 const redis = getRedis();
 
@@ -31,95 +30,110 @@ module.exports.signUp = async (userData) => {
 
 // login
 module.exports.logIn = async (userData) => {
-  const { userId } = userData;
+  let data,
+    err = null;
+  try {
+    const { email } = userData;
 
-  const user = await mongodb
-    .collection("test")
-    .find({ userId: "617d12df7b82331324b6f03d" })
-    .toArray();
+    const user = await mongodb.collection("test").find({ email }).toArray();
 
-  console.log(user);
+    // validate user creds in db
+    if (user.length) {
+      const { password, ...userData } = user[0];
+      userData["userId"] = userData._id.toString();
+      const refreshToken = getRefreshToken(userData);
+      const accessToken = getAccessToken(refreshToken);
 
-  // validate user creds in db
-  const userExists = true;
-  if (userExists) {
-    const refreshToken = getRefreshToken(userData);
-    const accessToken = getAccessToken(userData);
-
-    redis.SADD(userId, refreshToken);
-
-    res.status(200).json({
-      message: { refreshToken, accessToken, expiresIn: "1h" },
-      status: "success",
-    });
-  } else {
-    res.status(401).json({
-      message: "",
-      status: "error",
-    });
+      redis.SADD(userData["userId"], refreshToken);
+      data = { refreshToken, accessToken, expiresIn: "1h" };
+    } else {
+      throw {
+        message: "please check your username or password",
+      };
+    }
+  } catch (e) {
+    if (e) err = e;
   }
+  return { data, err };
 };
 
 // logout
-module.exports.logOut = (req, res) => {
-  const { refreshToken } = req.body;
-  const { userId } = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-  redis.SISMEMBER(userId, refreshToken, (err, result) => {
-    if (result === 1) {
-      redis.SREM(userId, refreshToken);
-      res.status(200).json({
-        status: "success",
-      });
-    } else {
-      res.status(200).json({
-        status: "You're already logged out",
-      });
-    }
-  });
+module.exports.logOut = (refreshToken) => {
+  let data,
+    err = null;
+  try {
+    const { userId } = jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
+    redis.SISMEMBER(userId, refreshToken, (err, result) => {
+      if (result === 1) {
+        console.log(result);
+        redis.SREM(userId, refreshToken);
+        data = "success";
+      } else {
+        throw {
+          message: "You're already logged out",
+        };
+      }
+    });
+  } catch (e) {
+    if (e) err = e;
+  }
+  return { data, err };
 };
 
 // logout of all devices
-module.exports.logOutOfAllDevices = (req, res) => {
-  const { refreshToken } = req.body;
-  const { userId } = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-  redis.SISMEMBER(userId, refreshToken, (err, result) => {
-    if (result === 1) {
-      redis.DEL(userId);
-      res.status(200).json({
-        status: "success",
-      });
-    } else {
-      res.status(401).json({
-        message: "unauthorized access",
-        status: "error",
-      });
-    }
-  });
+module.exports.logOutOfAllDevices = (refreshToken) => {
+  let data,
+    err = null;
+  try {
+    const { userId } = jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
+    redis.SISMEMBER(userId, refreshToken, (err, result) => {
+      if (result === 1) {
+        console.log(result);
+        redis.DEL(userId);
+        data = "success";
+      } else {
+        throw {
+          message: "You're already logged out",
+        };
+      }
+    });
+  } catch (e) {
+    if (e) err = e;
+  }
+
+  return { data, err };
 };
 
 // refresh the access token using refresh token
-module.exports.refreshAccessToken = (req, res) => {
-  const { refreshToken } = req.body;
-  const { userId, userName } = jwt.verify(
-    refreshToken,
-    process.env.REFRESH_TOKEN_SECRET
-  );
+module.exports.refreshAccessToken = (refreshToken) => {
+  let data,
+    err = null;
+  console.log(refreshToken);
+  try {
+    const { userId, userName } = jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
 
-  redis.SISMEMBER(userId, refreshToken, (err, result) => {
-    if (result === 1) {
-      const accessToken = getAccessToken({ userId, userName });
-      res.status(200).json({
-        status: "success",
-        message: {
-          accessToken,
-          expiresIn: "1h",
-        },
-      });
-    } else {
-      res.status(401).json({
-        message: "unauthorized access",
-        status: "error",
-      });
-    }
-  });
+    redis.SISMEMBER(userId, refreshToken, (err, result) => {
+      console.log(result);
+      if (result === 1) {
+        const accessToken = getAccessToken({ userId, userName });
+        data = accessToken;
+      } else {
+        throw {
+          message: "refresh token expired",
+        };
+      }
+    });
+  } catch (e) {
+    if (e) err = e;
+  }
+  return { data, err };
 };

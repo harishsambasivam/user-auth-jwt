@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon authServer.js",
-    "test": "jest --verbose --setupFiles dotenv/config"
+    "test": "jest --verbose --setupFiles dotenv/config",
+    "test:coverage": "jest --coverage --setupFiles dotenv/config"
   },
   "repository": {
     "type": "git",

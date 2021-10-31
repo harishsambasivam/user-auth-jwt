@@ -44,9 +44,9 @@ router.route("/signup").post(async (req, res) => {
   }
 });
 
-router.route("/logout", (req, res) => {
+router.route("/logout").delete((req, res) => {
   try {
-    const { result: data, err } = logOut(req.body);
+    const { data, err } = logOut(req.body.refreshToken);
     if (err) throw err;
     return res.status(200).send({
       message: data,
@@ -62,9 +62,9 @@ router.route("/logout", (req, res) => {
   }
 });
 
-router.route("/logout/all", (req, res) => {
+router.route("/logout/all").delete((req, res) => {
   try {
-    const { result: data, err } = logOutOfAllDevices(req.body);
+    const { result: data, err } = logOutOfAllDevices(req.body.refreshToken);
     if (err) throw err;
     return res.status(200).send({
       message: data,
@@ -80,9 +80,9 @@ router.route("/logout/all", (req, res) => {
   }
 });
 
-router.route("/refresh/accesstoken", (req, res) => {
+router.route("/refresh/accesstoken").post((req, res) => {
   try {
-    const { result: data, err } = refreshAccessToken(req.body);
+    const { result: data, err } = refreshAccessToken(req.body.refreshToken);
     if (err) throw err;
     return res.status(200).send({
       message: data,

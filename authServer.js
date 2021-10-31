@@ -17,7 +17,6 @@ async function init() {
     await connectMongoDB();
   } catch (e) {
     console.log("unable to connect to db's");
-    console.error(e);
   }
 
   const userRouter = require("./components/user/router");
